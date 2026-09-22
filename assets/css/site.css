@@ -779,7 +779,8 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  will-change: transform;
+  /* UMA foto estática. Nada de transform/zoom/parallax: o elemento nunca é
+     tocado pela rolagem, então o navegador não precisa de camada própria. */
 }
 .film__grade {
   position: absolute;
@@ -872,29 +873,9 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   transform-origin: left;
   will-change: transform;
 }
-.film__load {
-  /* NÃO pode ser opaco: se o vídeo demora (preload tardio, rede lenta), um
-     véu cheio de --navy-900 vira uma parede lisa por cima do pôster.
-     Sem fundo próprio, o pôster do <video> aparece desde o primeiro quadro. */
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  display: grid;
-  place-items: center;
-  transition: opacity 0.7s var(--ease), visibility 0.7s;
-}
-.film__load.is-done { opacity: 0; visibility: hidden; }
-.film__load span {
-  font-size: 0.68rem;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.62);
-  background: rgba(0, 21, 56, 0.55);
-  padding: 0.7em 1.2em;
-  border-radius: 100px;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-}
+/* O véu "Preparando a jornada" (`.film__load`) existia apenas para cobrir a
+   espera do vídeo. Com a foto estática não há espera: o elemento saiu do HTML
+   e a regra saiu do CSS. */
 
 /* ------------------------------------------------------------
    9. TIPOS DE EVENTO

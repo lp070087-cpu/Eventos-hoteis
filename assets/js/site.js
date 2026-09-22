@@ -241,21 +241,39 @@
   // Agora a rede roda duas vezes: uma no primeiro quadro e outra quando o
   // carregamento termina, sempre com a geometria já assentada, e faz uma
   // varredura de segurança com folga para nenhum revelável ficar invisível.
+  var revealsPendentes = alvos.length;
   function varrerReveals() {
+    var pendentes = 0;
     alvos.forEach(function (el) {
+      if (el.classList.contains('is-in')) return;
+      pendentes++;
       var r = el.getBoundingClientRect();
       // já assentado na parte de cima da janela: pode entrar sem esperar o IO
-      if (r.top < window.innerHeight * 0.86) el.classList.add('is-in');
-      // proteção: passou do meio da tela e ainda está invisível = nunca pode
-      // continuar reservando altura sem mostrar conteúdo
-      if (r.bottom < window.innerHeight * 0.5) el.classList.add('is-in');
+      if (r.top < window.innerHeight * 0.86) { el.classList.add('is-in'); return; }
+      // Já passou da janela (ficou ACIMA dela) e continua invisível.
+      // Este é o caso que produzia a parede vazia: os 5 cartões da grade de
+      // espaços (.space.reveal-img) reservam a altura pelo `aspect-ratio` e só
+      // pintam com `.is-in`. Quando a página é aberta/restaurada já abaixo
+      // deles — ou quando o menu salta direto para uma âncora adiante — o
+      // IntersectionObserver nunca dispara para quem ficou acima da tela: os
+      // cartões continuavam ocupando ~1.040 px sem mostrar imagem nenhuma.
+      if (r.bottom < 0) el.classList.add('is-in');
     });
+    revealsPendentes = pendentes;
+    return pendentes;
   }
   requestAnimationFrame(varrerReveals);
   // as fotos chegam depois e mudam a altura da página: reavalia com a
   // geometria final (e de novo no retorno pelo cache do navegador)
   window.addEventListener('load', varrerReveals);
   window.addEventListener('pageshow', varrerReveals);
+  // saltos de âncora (o menu pula direto para uma seção): roda por 4 s em
+  // intervalos de 400 ms — nunca por quadro, para não pesar na rolagem —
+  // e para assim que não sobrar nenhum revelável invisível.
+  var vigiaReveals = setInterval(function () {
+    if (varrerReveals() === 0) clearInterval(vigiaReveals);
+  }, 400);
+  setTimeout(function () { clearInterval(vigiaReveals); }, 4000);
 
   /* ══════════════════════════════════════════════════════════
      5. NÚMEROS QUE CONTAM
@@ -286,21 +304,14 @@
   }
 
   /* ══════════════════════════════════════════════════════════
-     6. JORNADA — filme dirigido pelo scroll
+     6. JORNADA — a foto é ESTÁTICA; só os textos mudam no scroll
      ══════════════════════════════════════════════════════════ */
   var secFilme  = $('#jornada');
   var secCta    = $('#orcamento');
-  var video     = $('#filmVideo');
   var filmeBar  = $('#filmBar');
   var filmePct  = $('#filmPct');
-  var filmeLoad = $('#filmLoad');
   var beats     = $$('.beat');
 
-  var filmePronto = false;     // metadados + dados disponíveis
-  var filmeQuerido = false;
-  var filmeAlvo = 0;           // progresso 0..1 pedido pelo scroll
-  var filmeSuave = 0;          // progresso suavizado
-  var filmeIniciado = false;
   var beatAtual = -1;
 
   // janelas numéricas lidas uma única vez
@@ -318,83 +329,10 @@
     beatAtual = ativo;
   }
 
-  function aoCarregarFilme() {
-    if (!video) return;
-    var dur = video.duration;
-    if (!isFinite(dur) || dur <= 0) { semFilme(); return; }
-    if (!video.seekable || video.seekable.length === 0) { semFilme(); return; }
-    filmePronto = true;
-    if (filmeLoad) filmeLoad.classList.add('is-done');
-  }
-  function semFilme() {
-    // mantém a seção utilizável: poster estático + narrativa rolando
-    filmePronto = false;
-    if (filmeLoad) filmeLoad.classList.add('is-done');
-  }
-  // enquanto o vídeo não chega, o véu não pode virar uma tela parada:
-  // depois de alguns segundos ele sai e a capa assume
-  function esconderVeu() { if (filmeLoad) filmeLoad.classList.add('is-done'); }
-
-  // Os primeiros quadros já bastam para pintar; o resto entra em paralelo.
-  // Assim o download de 2,7 MB nunca segura o carregamento da página.
-  function prepararFilme() {
-    if (!video || filmeQuerido) return;
-    filmeQuerido = true;
-    video.setAttribute('preload', 'auto');
-    try { video.load(); } catch (e) {}
-    var pr = video.play();
-    if (pr && pr.then) { pr.then(function () { video.pause(); }).catch(function () {}); }
-    setTimeout(esconderVeu, 2500);
-  }
-
-  if (video && secFilme && !REDUZ) {
-    video.addEventListener('loadedmetadata', aoCarregarFilme);
-    video.addEventListener('loadeddata', aoCarregarFilme);
-    video.addEventListener('error', semFilme);
-
-    // O vídeo é a ÚNICA imagem desta seção: ele nunca é trocado por outro
-    // arquivo. Mas `preload="metadata"` deixava o navegador buscar só o
-    // cabeçalho, e a primeira pintura da seção acontecia muito tempo depois
-    // de o visitante entrar nela — dando a impressão de que a imagem
-    // "demorava a aparecer" e mudava durante a rolagem.
-    // Buscando os primeiros quadros já no início, a imagem está pintada antes
-    // de o visitante chegar: ela fica parada e só os textos (`.beat`) trocam.
-    prepararFilme();
-
-    // tenta liberar a busca no iOS após a primeira interação
-    var desbloquear = function () {
-      var pr = video.play();
-      if (pr && pr.then) { pr.then(function () { video.pause(); }).catch(function () {}); }
-      window.removeEventListener('touchstart', desbloquear);
-      window.removeEventListener('click', desbloquear);
-    };
-    window.addEventListener('touchstart', desbloquear, { passive: true, once: true });
-    window.addEventListener('click', desbloquear, { once: true });
-
-    // pré-carrega só quando a seção se aproxima
-    if ('IntersectionObserver' in window) {
-      var obsFilme = new IntersectionObserver(function (entes) {
-        if (entes.some(function (e) { return e.isIntersecting; })) {
-          prepararFilme();
-          obsFilme.disconnect();
-        }
-      }, { rootMargin: '120% 0px 120% 0px' });
-      obsFilme.observe(secFilme);
-    } else {
-      prepararFilme();
-    }
-
-    // escape: se nada carregar em 12 s, a seção assume o modo estático
-    setTimeout(function () { if (!filmePronto) semFilme(); }, 12000);
-  } else if (filmeLoad) {
-    filmeLoad.classList.add('is-done');
-  }
-
-  /* ── loop principal: scroll, parallax e filme num único rAF ── */
+  /* ── loop principal: scroll, parallax e Jornada num único rAF ── */
   var heroMedia = $('#heroMedia');
   var ctaBg     = $('#ctaBg');
   var waFloat   = $('#waFloat');
-  var filmeVideo = video;
 
   function quadro() {
     var y = window.pageYOffset || document.documentElement.scrollTop;
@@ -415,27 +353,18 @@
     // janela visível — evita medir seções fora de tela
     var vh = window.innerHeight;
 
-    // filme (só mede enquanto a seção está em jogo)
+    // Jornada: a fotografia é ESTÁTICA (nenhum transform, nenhum zoom, nenhuma
+    // troca de arquivo). O progresso serve só para o indicador e para marcar
+    // qual TEXTO está ativo.
     if (secFilme) {
       var rSec = secFilme.getBoundingClientRect();
       if (rSec.bottom > -vh * 0.25 && rSec.top < vh * 1.4) {
         var altura = secFilme.offsetHeight - vh;
         var p = altura > 0 ? clamp(-rSec.top / altura, 0, 1) : 0;
-        filmeAlvo = p;
 
         if (filmeBar) filmeBar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
         if (filmePct) filmePct.textContent = String(Math.round(p * 100)).padStart(2, '0');
         marcarBeats(p);
-
-        if (!REDUZ && filmePronto && filmeVideo) {
-          filmeSuave = filmeIniciado ? lerp(filmeSuave, filmeAlvo, 0.13) : filmeAlvo;
-          filmeIniciado = true;
-          var dur = filmeVideo.duration;
-          var alvoT = filmeSuave * (dur - 0.06);
-          if (!filmeVideo.seeking && Math.abs(filmeVideo.currentTime - alvoT) > 0.035) {
-            try { filmeVideo.currentTime = alvoT; } catch (e) {}
-          }
-        }
       }
     }
 

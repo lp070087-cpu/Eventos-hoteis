@@ -365,14 +365,11 @@
 <!-- ══════════════ JORNADA (filme com scroll) ══════════════ -->
 <section class="film" id="jornada" aria-label="Jornada pelos espaços">
   <div class="film__sticky">
-    <!-- Uma única imagem para a seção inteira: o scroll troca só os TEXTOS
-         (os .beat abaixo). preload="auto" garante que os primeiros quadros já
-         estejam prontos antes de o visitante chegar, para a imagem nunca
-         "surgir" no meio da rolagem. -->
-    <video id="filmVideo" class="film__canvas" muted playsinline preload="auto"
-           poster="assets/film/jornada-poster.jpg" aria-hidden="true">
-      <source src="assets/film/jornada.mp4" type="video/mp4">
-    </video>
+    <!-- UMA única fotografia, estática, para a seção inteira.
+         Não há vídeo, não há sequência de quadros, não há zoom nem parallax:
+         a foto fica parada e apenas os TEXTOS (.beat) trocam na rolagem. -->
+    <img class="film__canvas" src="assets/film/jornada-poster.webp"
+         width="1280" height="720" alt="" aria-hidden="true" decoding="async">
     <div class="film__grade" aria-hidden="true"></div>
 
     <div class="film__ui">
@@ -420,7 +417,6 @@
     </div>
 
     <div class="film__bar" aria-hidden="true"><i id="filmBar"></i></div>
-    <div class="film__load" id="filmLoad" aria-hidden="true"><span>Preparando a jornada</span></div>
   </div>
 </section>
 
@@ -804,7 +800,7 @@
 <!-- ══════════════ CTA FINAL ══════════════ -->
 <section class="cta" id="orcamento">
   <div class="cta__bg" id="ctaBg">
-    <img src="assets/img/marca-pontos-1600.jpg" width="1600" height="2001" loading="lazy" decoding="async" alt="">
+    <img src="public/final%20do%20site.jpg" width="720" height="1280" loading="lazy" decoding="async" alt="">
   </div>
   <div class="wrap">
     <div class="cta__inner">
