@@ -365,7 +365,11 @@
 <!-- ══════════════ JORNADA (filme com scroll) ══════════════ -->
 <section class="film" id="jornada" aria-label="Jornada pelos espaços">
   <div class="film__sticky">
-    <video id="filmVideo" class="film__canvas" muted playsinline preload="metadata"
+    <!-- Uma única imagem para a seção inteira: o scroll troca só os TEXTOS
+         (os .beat abaixo). preload="auto" garante que os primeiros quadros já
+         estejam prontos antes de o visitante chegar, para a imagem nunca
+         "surgir" no meio da rolagem. -->
+    <video id="filmVideo" class="film__canvas" muted playsinline preload="auto"
            poster="assets/film/jornada-poster.jpg" aria-hidden="true">
       <source src="assets/film/jornada.mp4" type="video/mp4">
     </video>

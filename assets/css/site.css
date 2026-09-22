@@ -703,6 +703,14 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   overflow: hidden;
   min-height: 200px;
   box-shadow: var(--shadow-1);
+  /* Enquanto a foto não chega, o cartão reserva toda a altura dele pelo
+     `aspect-ratio`, mas NÃO tinha fundo próprio: mostrava o --paper (quase
+     branco) da seção. Eram as fotos da grade — ~1.040 px de altura, 5 fotos,
+     763 KB carregadas com loading="lazy" — aparecendo como uma área branca
+     enorme logo abaixo dos quatro números.
+     Com o fundo navy do próprio sistema de cores, o cartão passa a ler como
+     moldura de mídia desde o primeiro quadro: não existe mais "buraco". */
+  background: var(--navy-800);
 }
 .space img {
   position: absolute;

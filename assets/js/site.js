@@ -229,13 +229,33 @@
   } else {
     alvos.forEach(function (el) { el.classList.add('is-in'); });
   }
-  // elementos abaixo da dobra que já deveriam estar visíveis
-  requestAnimationFrame(function () {
+  // Rede de segurança dos reveals.
+  // Motivo: no instante em que o site.js roda (defer), as FOTOS da grade de
+  // espaços ainda não chegaram. Os cartões são figuras de `aspect-ratio`
+  // dentro de um grid, então medir a página nesse momento é medir uma página
+  // que ainda não tem a altura final. Qualquer elemento alcançado por essa
+  // leitura incompleta recebia `is-in` antes de entrar na tela — e, pior, um
+  // revelável que só entra na faixa visível depois que a rede termina de
+  // crescer a página podia ficar com `opacity: 0` (área vazia) até o
+  // IntersectionObserver se recuperar.
+  // Agora a rede roda duas vezes: uma no primeiro quadro e outra quando o
+  // carregamento termina, sempre com a geometria já assentada, e faz uma
+  // varredura de segurança com folga para nenhum revelável ficar invisível.
+  function varrerReveals() {
     alvos.forEach(function (el) {
       var r = el.getBoundingClientRect();
-      if (r.top < window.innerHeight * 0.9) el.classList.add('is-in');
+      // já assentado na parte de cima da janela: pode entrar sem esperar o IO
+      if (r.top < window.innerHeight * 0.86) el.classList.add('is-in');
+      // proteção: passou do meio da tela e ainda está invisível = nunca pode
+      // continuar reservando altura sem mostrar conteúdo
+      if (r.bottom < window.innerHeight * 0.5) el.classList.add('is-in');
     });
-  });
+  }
+  requestAnimationFrame(varrerReveals);
+  // as fotos chegam depois e mudam a altura da página: reavalia com a
+  // geometria final (e de novo no retorno pelo cache do navegador)
+  window.addEventListener('load', varrerReveals);
+  window.addEventListener('pageshow', varrerReveals);
 
   /* ══════════════════════════════════════════════════════════
      5. NÚMEROS QUE CONTAM
@@ -331,6 +351,15 @@
     video.addEventListener('loadedmetadata', aoCarregarFilme);
     video.addEventListener('loadeddata', aoCarregarFilme);
     video.addEventListener('error', semFilme);
+
+    // O vídeo é a ÚNICA imagem desta seção: ele nunca é trocado por outro
+    // arquivo. Mas `preload="metadata"` deixava o navegador buscar só o
+    // cabeçalho, e a primeira pintura da seção acontecia muito tempo depois
+    // de o visitante entrar nela — dando a impressão de que a imagem
+    // "demorava a aparecer" e mudava durante a rolagem.
+    // Buscando os primeiros quadros já no início, a imagem está pintada antes
+    // de o visitante chegar: ela fica parada e só os textos (`.beat`) trocam.
+    prepararFilme();
 
     // tenta liberar a busca no iOS após a primeira interação
     var desbloquear = function () {
