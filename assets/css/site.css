@@ -1362,12 +1362,29 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   z-index: 0;
   will-change: transform;
 }
-.cta__bg img { width: 100%; height: 100%; object-fit: cover; opacity: 0.32; }
+.cta__bg img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  /* A foto é vertical (720x1280) e o letreiro "Mar Hotel" fica no TOPO dela
+     (y 230-400). Com `object-position` no padrão (50%), o `cover` num painel
+     largo mostrava só o miolo — teto e coluna — e o letreiro ficava fora do
+     quadro. Subindo o enquadramento para o topo, o nome do hotel entra na
+     composição. `object-position` não distorce: o `cover` só recorta. */
+  object-position: 50% 6%;
+  opacity: 0.72;
+}
 .cta__bg::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(80% 70% at 50% 50%, rgba(1, 21, 56, 0.55), rgba(1, 21, 56, 0.96));
+  /* Antes: rgba(1,21,56,.55) no centro -> .96 nas bordas, sobre uma foto a 32%.
+     O resultado era uma parede azul. Agora o véu é bem mais leve (.34 -> .74) e
+     a foto entra a 72%: a fachada aparece e o branco continua legível.
+     O centro ficou em .34 (e não menos) porque é ele que decide o contraste do
+     parágrafo, que é o texto de menor contraste da seção: medido, .26 deixava o
+     parágrafo em 4,2:1 — abaixo dos 4,5:1 de AA. Com .34 todos os textos da
+     seção ficam em 4,5:1 ou acima, e ainda assim a foto aparece. */
+  background: radial-gradient(80% 70% at 50% 50%, rgba(1, 21, 56, 0.34), rgba(1, 21, 56, 0.74));
 }
 .cta__inner { position: relative; z-index: 2; max-width: 62ch; margin-inline: auto; }
 .cta h2 { font-size: var(--t-h1); color: #fff; margin-top: 1rem; }
@@ -1505,6 +1522,10 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
 }
 
 @media (max-width: 780px) {
+  /* No celular a seção fica alta e estreita, então o `cover` já mostra quase
+     toda a altura da foto: basta um ajuste leve para o letreiro não encostar
+     no topo. Sem distorção — o `cover` só recorta. */
+  .cta__bg img { object-position: 50% 2%; }
   .film { height: 260vh; }
   .film__beats { min-height: clamp(11rem, 30vh, 15rem); max-width: 100%; }
   .hero__scroll { display: none; }
