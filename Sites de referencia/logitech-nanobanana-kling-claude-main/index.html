@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MX Keys S. — Master Series</title>
+  <link rel="preload" href="assets/frames/f_001.jpg" as="image" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav__bar">
+      <span class="nav__logo">logi</span>
+      <nav class="nav__links">
+        <a href="#features">Features</a>
+        <a href="#flow">Flow</a>
+      </nav>
+      <a href="#buy" class="btn btn--green nav__cta">Buy Now</a>
+    </div>
+  </header>
+
+  <!-- HERO: pinned, text left, scroll-scrub teardown right -->
+  <section id="scroll-hero" class="scroll-hero">
+    <div class="scroll-hero__sticky">
+      <div class="hero-stage">
+        <canvas id="hero-canvas" class="hero-canvas"></canvas>
+      </div>
+
+      <div class="hero-grid">
+        <div class="hero-text">
+          <p class="eyebrow">Master Series</p>
+          <h1>MX&nbsp;Keys&nbsp;S.</h1>
+          <p class="lede">
+            Luz de fundo inteligente. Teclas esféricas perfeitas.
+            Padrão de conectividade otimizado. Construído para dominar
+            o seu fluxo de trabalho.
+          </p>
+          <div class="hero-actions">
+            <a href="#buy" class="btn btn--green btn--lg">Comprar Agora</a>
+            <a href="#features" class="btn btn--ghost btn--lg">Ver Recursos</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="hero-loader" class="hero-loader"><span id="hero-loader-bar"></span></div>
+      <div class="scroll-progress"><span id="scroll-progress-bar"></span></div>
+    </div>
+  </section>
+
+  <!-- FEATURES: "Projetado para o seu workflow" -->
+  <section id="features" class="features reveal">
+    <header class="features__head">
+      <h2>Projetado para<br/>o seu workflow.</h2>
+      <p>Descubra os detalhes que tornam o MX&nbsp;Keys&nbsp;S a ferramenta
+         definitiva para criadores e codificadores avançados.</p>
+    </header>
+
+    <div class="bento">
+      <article class="bento-card bento-card--glow">
+        <div class="glow-stage">
+          <span class="glow-orb"></span>
+          <svg class="glow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18h6"/><path d="M10 22h4"/>
+            <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5"/>
+          </svg>
+          <span class="glow-line"></span>
+        </div>
+        <h3>Iluminação Inteligente</h3>
+        <p>As teclas acendem no momento em que suas mãos se aproximam.
+           O brilho se ajusta automaticamente às condições de iluminação.</p>
+      </article>
+
+      <article class="bento-card bento-card--keys">
+        <div class="keys-stage">
+          <img src="assets/keycaps.png" alt="Keycaps MX Keys" />
+        </div>
+        <h3>Teclas de Digitação Perfeita</h3>
+        <p>Teclas esféricas côncavas moldadas para as pontas dos dedos,
+           com deslizar sem esforço.</p>
+      </article>
+    </div>
+
+    <div class="compat">
+      <div class="compat__item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span>Windows</span>
+      </div>
+      <div class="compat__item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/></svg>
+        <span>iPad</span>
+      </div>
+      <div class="compat__item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        <span>Mac</span>
+      </div>
+      <div class="compat__item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="11" rx="1.5"/><path d="M2 20h20"/></svg>
+        <span>Linux</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECS -->
+  <section id="flow" class="section section--tech reveal">
+    <div class="tech__grid">
+      <div class="stat"><span class="stat__big">100</span><span class="stat__label">teclas mapeáveis</span></div>
+      <div class="stat"><span class="stat__big">5&nbsp;meses</span><span class="stat__label">de bateria</span></div>
+      <div class="stat"><span class="stat__big">3</span><span class="stat__label">dispositivos via Easy-Switch</span></div>
+    </div>
+  </section>
+
+  <!-- LAYERS -->
+  <section class="section section--layers reveal">
+    <h2 class="section__title">Anatomia de um clássico</h2>
+    <div class="cards">
+      <article class="card"><span class="card__num">01</span><h3>Keycaps</h3><p>Perfil baixo, esféricas e silenciosas, com toque preciso em cada acionamento.</p></article>
+      <article class="card"><span class="card__num">02</span><h3>Mecanismo</h3><p>Tesoura de precisão que garante estabilidade e curso consistente por anos.</p></article>
+      <article class="card"><span class="card__num">03</span><h3>Placa metálica</h3><p>Chassi de alumínio perfurado: rigidez total, peso mínimo.</p></article>
+      <article class="card"><span class="card__num">04</span><h3>PCB &amp; bateria</h3><p>Eletrônica de baixo consumo com até 5 meses de autonomia por carga.</p></article>
+      <article class="card"><span class="card__num">05</span><h3>Base</h3><p>Estrutura unibody que mantém tudo no lugar, sobre qualquer superfície.</p></article>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="buy" class="section section--cta reveal">
+    <h2>Feito para durar.<br/>Pensado nos mínimos detalhes.</h2>
+    <a class="btn btn--green btn--lg" href="#">Comprar agora</a>
+  </section>
+
+  <footer class="footer">
+    <span class="nav__logo">logi</span>
+    <p>Demo de hero com scroll-scrub · render gerado com Nano Banana + Kling 3.0</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
