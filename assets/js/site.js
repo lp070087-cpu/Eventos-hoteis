@@ -13,6 +13,44 @@
   var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
 
   /* ══════════════════════════════════════════════════════════
+     0. ALTURA DE JANELA ESTÁVEL — o "salto" da rolagem no celular
+     ──────────────────────────────────────────────────────────
+     O `svh` do CSS é o comprimento de viewport que NÃO muda quando a barra
+     de endereço do celular aparece/some — por isso ele governa toda a altura
+     de bloco do site. Só que o navegador não consegue atualizá-lo com a
+     página parada: numa rolagem pura a barra some, o layout segue com o valor
+     antigo e, quando o valor é finalmente recalculado, TODOS os blocos
+     medidos em `svh` encolhem de uma vez — inclusive os `320vh` da Jornada.
+     É esse recálculo tardio que aparece como "salto automático" ao descer;
+     ao subir, a barra volta e o mesmo recálculo acontece ao contrário, com o
+     mesmo salto para cima. Nada disso vem de scroll-snap, scrollIntoView ou
+     de um listener de scroll: o navegador move a página sozinho porque a
+     altura do documento mudou.
+
+     Aqui a altura de referência é medida UMA vez e congelada: o
+     `--vh-estavel` recebe um valor em px que o navegador não tem por que
+     recalcular durante a rolagem. A medida continua idêntica à de antes
+     (é o próprio `100svh`), então nenhum layout muda de tamanho — só deixa
+     de oscilar.
+     */
+  (function alturaEstavel() {
+    var raiz = document.documentElement;
+    var altura = 0;
+    try {
+      // sonda invisível: transforma `100svh` no px correspondente
+      var sonda = document.createElement('div');
+      sonda.style.cssText = 'position:absolute;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none';
+      raiz.appendChild(sonda);
+      altura = sonda.offsetHeight;
+      raiz.removeChild(sonda);
+    } catch (e) { altura = 0; }
+    // navegador sem `svh`: cai para a altura da janela (estável o bastante)
+    if (!altura || !isFinite(altura) || altura < 120) altura = window.innerHeight;
+    if (!altura || !isFinite(altura) || altura < 120) return;
+    raiz.style.setProperty('--vh-estavel', altura + 'px');
+  })();
+
+  /* ══════════════════════════════════════════════════════════
      1. ABERTURA CINEMATOGRÁFICA (typewriter)
      ══════════════════════════════════════════════════════════ */
   var intro    = $('#intro');

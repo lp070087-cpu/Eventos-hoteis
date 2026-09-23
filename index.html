@@ -788,11 +788,22 @@
         </div>
       </div>
 
-      <figure class="local__media reveal-img" style="--d:120ms">
-        <img src="assets/img/localizacao-aerea-900.webp" width="900" height="1598" loading="lazy" decoding="async"
-             alt="Vista aérea da orla de Boa Viagem, em Recife, com os edifícios à beira-mar">
-        <span class="local__pin" aria-hidden="true"></span>
-      </figure>
+      <div class="local__media reveal-img" style="--d:120ms">
+        <!-- MAPA REAL E INTERATIVO — não é imagem.
+             A incorporação é feita pelo endereço do hotel no formato
+             `maps?q=...&output=embed`, que é o embed público do Google Maps e
+             NÃO consome API key. Fica exatamente na área do card: a classe
+             `local__media` continua definindo o border-radius, o `aspect-ratio`
+             4/3, a sombra e a posição na grade; o iframe só preenche a caixa.
+             O antigo `<span class="local__pin">` (ponto pulsante desenhado em
+             CSS por cima da FOTO aérea) saiu junto com a foto: quem marca o
+             endereço agora é o pino do próprio mapa. -->
+        <iframe
+          src="https://www.google.com/maps?q=Av.+Boa+Viagem,+5426,+Boa+Viagem,+Recife+-+PE&z=16&hl=pt-BR&output=embed"
+          title="Mapa da localização — Av. Boa Viagem, 5426, Boa Viagem, Recife/PE"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen></iframe>
+      </div>
     </div>
   </div>
 </section>

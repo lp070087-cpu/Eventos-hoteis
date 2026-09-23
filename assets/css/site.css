@@ -348,7 +348,7 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
    ------------------------------------------------------------ */
 .hero {
   position: relative;
-  min-height: 100svh;
+  min-height: var(--vh-estavel);
   display: flex;
   align-items: flex-end;
   overflow: hidden;
@@ -381,7 +381,7 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   width: 100%;
   max-width: var(--maxw-wide);
   margin-inline: auto;
-  padding: 0 var(--gutter) clamp(2.6rem, 7vh, 5rem);
+  padding: 0 var(--gutter) clamp(2.6rem, calc(0.07 * var(--vh-estavel)), 5rem);
 }
 
 .hero__eyebrow {
@@ -502,7 +502,7 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   background: var(--navy-900);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-block: clamp(1.1rem, 2.6vh, 1.6rem);
+  padding-block: clamp(1.1rem, calc(0.026 * var(--vh-estavel)), 1.6rem);
   overflow: hidden;
 }
 .marquee { display: flex; width: max-content; animation: marquee 42s linear infinite; }
@@ -762,14 +762,18 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   /* O espaçador define só a DISTÂNCIA de rolagem do filme (não desenha nada).
      Estava em 460vh: com a janela fixa de 100svh, sobravam ~3,6 telas de
      rolagem em que o quadro apenas crescia — a "área gigante" relatada.
-     320vh mantém os 6 trechos narrativos legíveis e devolve 1,4 tela. */
-  height: 320vh;
+     320vh mantém os 6 trechos narrativos legíveis e devolve 1,4 tela.
+     Medido em `--vh-estavel` (a altura de referência congelada) e não em `vh`:
+     assim a Jornada conserva exatamente a mesma distância de rolagem de antes,
+     mas não encolhe de uma vez quando a barra de endereço reaparece — era essa
+     contração que empurrava a página para baixo no meio do gesto. */
+  height: calc(3.2 * var(--vh-estavel));
   background: var(--navy-900);
 }
 .film__sticky {
   position: sticky;
   top: 0;
-  height: 100svh;
+  height: var(--vh-estavel);
   overflow: hidden;
   background: var(--navy-900);
 }
@@ -892,7 +896,7 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  min-height: clamp(330px, 42vh, 440px);
+  min-height: clamp(330px, calc(0.42 * var(--vh-estavel)), 440px);
   border-radius: var(--r-m);
   overflow: hidden;
   isolation: isolate;
@@ -1136,10 +1140,25 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   top: 50%; left: 50%;
   width: clamp(52px, 6vw, 66px);
   height: clamp(52px, 6vw, 66px);
+  /* `aspect-ratio` amarra a altura à largura: o botão não tem mais como
+     achatar. O que estava errado era a largura e a altura virem de regras
+     diferentes — o bloco `@media (max-width: 780px)` sobrescrevia a largura
+     com `width: auto` (resto de uma versão em que o botão não tinha tamanho
+     próprio e precisava herdar a largura do cartão para centralizar o SVG),
+     enquanto a altura continuava no `clamp` de 52px. Largura de uma regra e
+     altura de outra: a proporção 1:1 se perdia, e como a largura resultante
+     acompanhava a largura de cada cartão, cada ícone saía de um tamanho
+     diferente. A regra que causava isso foi removida no bloco do 780px. */
+  aspect-ratio: 1 / 1;
   transform: translate(-50%, -50%) scale(0.94);
   border-radius: 50%;
   display: grid;
   place-items: center;
+  /* nada de encolher nem esticar: o botão não é item de flexão, mas o
+     `flex-shrink` explícito blinda o círculo se algum dia for. */
+  flex: none;
+  flex-shrink: 0;
+  padding: 0;
   background: rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -1326,24 +1345,30 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   aspect-ratio: 4 / 3;
   box-shadow: var(--shadow-2);
   position: relative;
+  /* Reserva a altura enquanto o mapa carrega, para o card não nascer com
+     0 de altura e empurrar a seção quando o iframe chega. Cor é do próprio
+     sistema (--navy-800 é o fundo da seção), então não apareceria emenda. */
+  background: var(--navy-700);
 }
 .local__media img { width: 100%; height: 100%; object-fit: cover; }
-.local__pin {
-  position: absolute;
-  left: 50%; top: 52%;
-  width: 14px; height: 14px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: var(--blue-300);
-  box-shadow: 0 0 0 0 rgba(143, 192, 232, 0.65);
-  animation: pin 2.6s var(--ease) infinite;
+/* ANTES: a `.local__pin` era um ponto azul pulsante desenhado por cima da FOTO
+   aérea, sempre em left:50%/top:52%, porque a foto era escolhida de modo que o
+   hotel caísse no centro. Com o mapa real quem marca o endereço é o pino do
+   próprio mapa — o ponto artificial ficaria numa posição fixa que não
+   corresponde às ruas quando o visitante arrasta o mapa. Saiu do HTML e a
+   regra saiu daqui. */
+
+/* O mapa ocupa a área inteira do card. Nada de ponteiro no miolo: os gestos
+   precisam chegar ao mapa para ele poder ser arrastado e ampliado. */
+.local__media iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
 }
-@keyframes pin {
-  0% { box-shadow: 0 0 0 0 rgba(143, 192, 232, 0.6); }
-  70% { box-shadow: 0 0 0 22px rgba(143, 192, 232, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(143, 192, 232, 0); }
-}
-@media (prefers-reduced-motion: reduce) { .local__pin { animation: none; } }
+/* A regra `.local__pin`, o `@keyframes pin` e a exceção de movimento reduzido
+   que só existiam para ela foram removidos junto com o elemento. */
 
 /* ------------------------------------------------------------
    15. CTA FINAL
@@ -1354,7 +1379,7 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   color: #fff;
   overflow: hidden;
   text-align: center;
-  padding-block: clamp(4.5rem, 12vh, 9rem);
+  padding-block: clamp(4.5rem, calc(0.12 * var(--vh-estavel)), 9rem);
 }
 .cta__bg {
   position: absolute;
@@ -1526,7 +1551,7 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
      toda a altura da foto: basta um ajuste leve para o letreiro não encostar
      no topo. Sem distorção — o `cover` só recorta. */
   .cta__bg img { object-position: 50% 2%; }
-  .film { height: 260vh; }
+  .film { height: calc(2.6 * var(--vh-estavel)); }
   .film__beats { min-height: clamp(11rem, 30vh, 15rem); max-width: 100%; }
   .hero__scroll { display: none; }
   .hero { align-items: flex-end; }
@@ -1539,11 +1564,23 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   .gastro__media { grid-template-columns: 1fr 1fr; }
   .gm-a { grid-row: span 1; grid-column: span 2; aspect-ratio: 16 / 10; }
   .btn--full { width: 100%; }
-  .reel__play { width: auto; }
+  /* Aqui existia `.reel__play { width: auto; }`. Era resto de uma versão em que
+     o botão de play não tinha tamanho próprio — precisava herdar a largura do
+     cartão para centralizar o SVG. Hoje ele é um círculo com largura E altura
+     definidas, então essa regra só fazia mal: derrubava o `clamp` da largura e
+     transformava o círculo numa pílula esticada (e de tamanho diferente em cada
+     cartão, porque cada cartão tem a sua largura). A altura continuava 52px, e
+     é por isso que no celular o ícone aparecia achatado/oval. */
 }
 
 @media (max-width: 560px) {
-  :root { --sec-y: clamp(3.4rem, 9vh, 5rem); }
+  /* Único ponto do site que reintroduzia `vh` no celular — e é justamente no
+     aparelho reclamado. Eram 9 `.section` mais a `.galeria`, cada uma medindo
+     este padding em `vh`: com a barra de endereço aparecendo/sumindo, elas
+     variavam ~16px cada, ~170px somados. Passa a usar a mesma altura de
+     referência congelada. O valor é idêntico (0.09 × 100svh), então o
+     espaçamento do celular não muda. */
+  :root { --sec-y: clamp(3.4rem, calc(0.09 * var(--vh-estavel)), 5rem); }
   .tipos__grid,
   .dif__grid,
   .exp__grid,
@@ -1554,7 +1591,7 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
   .space--c, .space--d { grid-column: span 12; aspect-ratio: 4 / 3; }
   .hero__facts { gap: 1.2rem 1.8rem; }
   .fact__n { font-size: 1.3rem; }
-  .film { height: 240vh; }
+  .film { height: calc(2.4 * var(--vh-estavel)); }
   .galeria__rail figure { width: 78vw; }
   .manifesto__media { aspect-ratio: 4 / 3; }
   .cta__contact { flex-direction: column; gap: 1.1rem; }
@@ -1565,14 +1602,13 @@ body.menu-open .menu__foot { opacity: 1; transform: none; }
    ------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   .marquee,
-  .hero__scroll i,
-  .local__pin { animation: none !important; }
+  .hero__scroll i { animation: none !important; }
   .hero h1 .ln > span { transform: none !important; }
   .hero__eyebrow, .hero__lead, .hero__actions, .hero__facts {
     opacity: 1 !important; transform: none !important;
   }
   .film { height: auto; }
-  .film__sticky { position: relative; height: 78svh; }
+  .film__sticky { position: relative; height: calc(0.78 * var(--vh-estavel)); }
   .film__beats { position: static; min-height: 0; }
   .beat { position: static; opacity: 1; transform: none; margin-bottom: 2rem; }
   .beat:not(:first-child) { display: none; }

@@ -41,7 +41,19 @@
 
   /* --- Espaço ---------------------------------------------- */
   --gutter: clamp(1.15rem, 4vw, 3.5rem);
-  --sec-y:  clamp(4.5rem, 11vh, 9.5rem);
+  /* Altura de referência da janela.
+     O `svh` é o único comprimento de viewport que não muda quando a barra de
+     endereço do celular aparece/some — por isso ele governa toda a altura de
+     bloco do site. Mas, ao contrário do `vh`, o navegador não consegue
+     atualizá-lo com a página parada: numa rolagem pura a barra some, o `svh`
+     real muda, o layout continua com o valor antigo e, quando o valor é
+     finalmente recalculado, todos os blocos medidos em `svh` encolhem de uma
+     vez — é isso que aparece como o "salto automático".
+     Aqui a altura vira uma variável: por padrão é o próprio `svh` (comportamento
+     de sempre, e correto se o JS não rodar), e o site.js a substitui por um
+     valor em px medido uma única vez e mantido estável. Nenhuma medida muda. */
+  --vh-estavel: 100svh;
+  --sec-y:  clamp(4.5rem, calc(0.11 * var(--vh-estavel)), 9.5rem);
   --maxw: 1280px;
   --maxw-wide: 1480px;
 
